@@ -13,21 +13,52 @@ func Add(a, b float64) float64 {
 
 // Subtract takes two numbers and returns the result of subtracting the second
 // from the first.
-func Subtract(a, b float64) float64 {
-	return a - b
+func Subtract(nums ...float64) (float64, error) {
+	if len(nums) < 2 {
+		return 0, errors.New("Please call with at least 2 args")
+	}
+	if len(nums) == 2 {
+		return nums[0] - nums[1], nil
+	}
+	result, err := Subtract(nums[:len(nums)-1]...)
+	if err != nil {
+		return 0, err // How can I mock to test this?
+	}
+	return result - nums[len(nums)-1], nil
 }
 
 // Multiply multiplies numbers
-func Multiply(a, b float64) float64 {
-	return a * b
+func Multiply(nums ...float64) (float64, error) {
+	if len(nums) < 2 {
+		return 0, errors.New("Please call with at least 2 args")
+	}
+	if len(nums) == 2 {
+		return nums[0] * nums[1], nil
+	}
+	result, err := Multiply(nums[:len(nums)-1]...)
+	if err != nil {
+		return 0, err // How can I mock to test this?
+	}
+	return result * nums[len(nums)-1], nil
+
 }
 
-// Divide divides two numbers or returns an error
-func Divide(a, b float64) (float64, error) {
-	if b == 0 {
+// Divide divides 2+ numbers or returns an error
+func Divide(nums ...float64) (float64, error) {
+	if len(nums) < 2 {
+		return 0, errors.New("We need more operands")
+	}
+	if nums[len(nums)-1] == 0 {
 		return 0, errors.New("Can't divide by zero")
 	}
-	return a / b, nil
+	if len(nums) == 2 {
+		return nums[0] / nums[1], nil
+	}
+	result, err := Divide(nums[:len(nums)-1]...)
+	if err != nil {
+		return 0, err // How can I mock to get coverage on this line?
+	}
+	return result / nums[len(nums)-1], nil
 }
 
 // Sqrt takes the square root of a number
