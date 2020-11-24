@@ -237,3 +237,50 @@ func TestSqrt(t *testing.T) {
 		}
 	}
 }
+
+func TestEval(t *testing.T) {
+	testcases := []struct {
+		in         string
+		want       float64
+		expectsErr bool
+	}{
+		{in: "1+2", want: 3, expectsErr: false},
+		{in: "2+2", want: 4, expectsErr: false},
+		{in: "2-3", want: -1, expectsErr: false},
+		{in: "2*3", want: 6, expectsErr: false},
+		{in: "3/2", want: 1.5, expectsErr: false},
+		{in: "1  +    2", want: 3, expectsErr: false},
+		{in: "2 + 2", want: 4, expectsErr: false},
+		{in: "2- 3", want: -1, expectsErr: false},
+		{in: "2     *      3", want: 6, expectsErr: false},
+		{in: "3/   2", want: 1.5, expectsErr: false},
+		{in: "3/", expectsErr: true},
+		{in: "3*", expectsErr: true},
+		{in: "3+", expectsErr: true},
+		{in: "3-", expectsErr: true},
+		{in: "/", expectsErr: true},
+		{in: "*", expectsErr: true},
+		{in: "+", expectsErr: true},
+		{in: "-", expectsErr: true},
+		{in: " /", expectsErr: true},
+		{in: "* ", expectsErr: true},
+		{in: " + ", expectsErr: true},
+		{in: "  -  ", expectsErr: true},
+		{in: "2^2", expectsErr: true},
+		{in: "2**3", expectsErr: true},
+	}
+
+	for _, testcase := range testcases {
+		got, err := calculator.EvalExpr(testcase.in)
+		switch {
+		case err != nil && !testcase.expectsErr:
+			t.Errorf("Got an error without expecting one for %v", testcase.in)
+		case err == nil && testcase.expectsErr:
+			t.Errorf("Did not get an error but expected one for %v", testcase.in)
+		case err == nil && !testcase.expectsErr:
+			if testcase.want != got {
+				t.Errorf("Got %v, wanted %v, using %v", got, testcase.want, testcase.in)
+			}
+		}
+	}
+}

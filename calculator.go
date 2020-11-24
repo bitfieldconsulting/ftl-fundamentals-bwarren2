@@ -4,6 +4,9 @@ package calculator
 import (
 	"errors"
 	"math"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 // Add takes two numbers and returns the result of adding them together.
@@ -67,4 +70,37 @@ func Sqrt(a float64) (float64, error) {
 		return 0, errors.New("Can't take the square root of a negative number")
 	}
 	return math.Pow(a, .5), nil
+}
+
+// EvalExpr evaluates simple arithmetic expressions of "float64 operator float64"
+func EvalExpr(in string) (float64, error) {
+	re := regexp.MustCompile(`\d*(\.\d)?\s*[-+\/*]\s*\d*(\.\d)?$`)
+	if !re.MatchString(in) {
+		return 0, errors.New("Could not parse input expression")
+	}
+	operatorRe := regexp.MustCompile(`[-+\/*]`)
+	operator := operatorRe.FindAllString(in, -1)[0]
+	parts := strings.Split(in, operator)
+
+	left, err := strconv.ParseFloat(strings.TrimSpace(parts[0]), 64)
+	if err != nil {
+		return 0, err
+	}
+	right, err := strconv.ParseFloat(strings.TrimSpace(parts[1]), 64)
+	if err != nil {
+		return 0, err
+	}
+
+	switch operator {
+	case `+`:
+		return left + right, nil
+	case `-`:
+		return left - right, nil
+	case `*`:
+		return left * right, nil
+	case `/`:
+		return left / right, nil
+	default:
+		return 0, errors.New("Could not match the given operator") // How could I mock to test this line?
+	}
 }
