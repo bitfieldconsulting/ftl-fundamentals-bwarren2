@@ -20,10 +20,10 @@ func Add(a, b float64, rest ...float64) float64 {
 	return result
 }
 
-// Subtract takes 2+ numbers and returns the result of subtracting the second
-// from the first.  For variadic args, evaluation is (a - b) - c ...
-func Subtract(first float64, second float64, rest ...float64) float64 {
-	result := first - second
+// Subtract takes 2+ numbers and returns the result of subtracting the b
+// from the a.  For variadic args, evaluation is (a - b) - c ...
+func Subtract(a float64, b float64, rest ...float64) float64 {
+	result := a - b
 
 	for _, item := range rest {
 		result -= item
@@ -34,8 +34,8 @@ func Subtract(first float64, second float64, rest ...float64) float64 {
 }
 
 // Multiply multiplies 2+ numbers.  For variadic args, evaluation is (a * b) * c ...
-func Multiply(first float64, second float64, rest ...float64) float64 {
-	result := first * second
+func Multiply(a float64, b float64, rest ...float64) float64 {
+	result := a * b
 
 	for _, item := range rest {
 		result *= item
@@ -47,11 +47,11 @@ func Multiply(first float64, second float64, rest ...float64) float64 {
 
 // Divide divides 2+ numbers or returns an error if it would divide by 0.
 // For variadic args, evaluation is (a / b) / c ...
-func Divide(first float64, second float64, rest ...float64) (float64, error) {
-	if second == 0 {
+func Divide(a float64, b float64, rest ...float64) (float64, error) {
+	if b == 0 {
 		return 0, errors.New("can't divide by zero")
 	}
-	result := first / second
+	result := a / b
 
 	for _, item := range rest {
 		if item == 0 {
