@@ -3,6 +3,7 @@ package calculator
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
@@ -65,7 +66,7 @@ func Divide(first float64, second float64, rest ...float64) (float64, error) {
 // Sqrt takes the square root of a nonnegative number or returns an error.
 func Sqrt(a float64) (float64, error) {
 	if a < 0 {
-		return 0, errors.New("can't take the square root of a negative number")
+		return 0, fmt.Errorf("can't take the square root of a negative number: %f", a)
 	}
 	return math.Sqrt(a), nil
 }
@@ -106,6 +107,6 @@ func EvalExpr(in string) (float64, error) {
 	case `/`:
 		return left / right, nil
 	default:
-		return 0, errors.New("Could not match the given operator") // How could I mock to test this line?
+		return 0, errors.New("Could not match the given operator")
 	}
 }
