@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAddMulti(t *testing.T) {
+func TestAdd(t *testing.T) {
 	testcases := []struct {
 		a, b float64
 		rest []float64
@@ -42,7 +42,7 @@ func TestAddRandom(t *testing.T) {
 	}
 }
 
-func TestSubtractMulti(t *testing.T) {
+func TestSubtract(t *testing.T) {
 	testcases := []struct {
 		a, b       float64
 		rest       []float64
@@ -79,7 +79,7 @@ func TestSubtractRandom(t *testing.T) {
 	}
 }
 
-func TestMultiplyMulti(t *testing.T) {
+func TestMultiply(t *testing.T) {
 	testcases := []struct {
 		a, b, want float64
 		rest       []float64
@@ -109,7 +109,7 @@ func TestMultiplyMulti(t *testing.T) {
 	}
 }
 
-func TestDivideMulti(t *testing.T) {
+func TestDivide(t *testing.T) {
 	testcases := []struct {
 		a, b       float64
 		rest       []float64
