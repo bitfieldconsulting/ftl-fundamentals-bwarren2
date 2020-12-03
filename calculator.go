@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// Add takes two numbers and returns the result of adding them together.
+// Add takes 2+ numbers and returns the result of adding them together.
 func Add(a, b float64, rest ...float64) float64 {
 	result := a + b
 	for _, item := range rest {
