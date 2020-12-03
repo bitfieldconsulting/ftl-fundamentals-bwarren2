@@ -6,25 +6,6 @@ import (
 	"testing"
 )
 
-type BinaryOpTestCase struct {
-	in1, in2, want float64
-	expectsErr     bool
-	name           string
-}
-
-type UnaryOpTestCase struct {
-	in, want   float64
-	expectsErr bool
-	name       string
-}
-
-type MultiOpTestCase struct {
-	in         []float64
-	want       float64
-	expectsErr bool
-	name       string
-}
-
 func TestAdd(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -233,7 +214,11 @@ func TestDivideMulti(t *testing.T) {
 }
 
 func TestSqrt(t *testing.T) {
-	testcases := []UnaryOpTestCase{
+	testcases := []struct {
+		in, want   float64
+		expectsErr bool
+		name       string
+	}{
 		{in: 4, want: 2, name: "Sqrt 4"},
 		{in: 0, want: 0, name: "Sqrt 0"},
 		{in: 1, want: 1, name: "Sqrt 1"},
