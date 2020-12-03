@@ -27,7 +27,11 @@ type MultiOpTestCase struct {
 
 func TestAdd(t *testing.T) {
 	t.Parallel()
-	tests := []BinaryOpTestCase{
+	tests := []struct {
+		in1, in2, want float64
+		expectsErr     bool
+		name           string
+	}{
 		{in1: 0, in2: 0, want: 0, name: "Add two units"},
 		{in1: 1, in2: 2, want: 3, name: "Add two nonunits"},
 		{in1: 0, in2: 2, want: 2, name: "Add unit and nonunit"},
@@ -43,6 +47,26 @@ func TestAdd(t *testing.T) {
 	}
 }
 
+func TestAddMulti(t *testing.T) {
+	testcases := []struct {
+		first, second float64
+		rest          []float64
+		want          float64
+		expectsErr    bool
+		name          string
+	}{
+		{first: 1, second: 2, rest: []float64{}, want: 3, name: "Add two numbers"},
+		{first: 1, second: 2, rest: []float64{3}, want: 6, name: "Add three numbers"},
+		{first: 1, second: 2, rest: []float64{3, 4}, want: 10, name: "Add four numbers"},
+		{first: -1, second: 2, rest: []float64{-3, 4, -5}, want: -3, name: "Add five numbers"},
+	}
+	for _, testcase := range testcases {
+		got := calculator.Add(testcase.first, testcase.second, testcase.rest...)
+		if testcase.want != got {
+			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
+		}
+	}
+}
 func TestAddRandom(t *testing.T) {
 	t.Parallel()
 	for i := 0; i < 100; i++ {
@@ -57,7 +81,11 @@ func TestAddRandom(t *testing.T) {
 
 func TestSubtract(t *testing.T) {
 	t.Parallel()
-	tests := []BinaryOpTestCase{
+	tests := []struct {
+		in1, in2, want float64
+		expectsErr     bool
+		name           string
+	}{
 		{in1: 4, in2: 2, want: 2, name: "Subtract two positives"},
 		{in1: 2, in2: 0, want: 2, name: "Subtract positive and zero"},
 		{in1: 0, in2: 2, want: -2, name: "Subtract zero and positive"},
@@ -65,10 +93,7 @@ func TestSubtract(t *testing.T) {
 	}
 	for _, testcase := range tests {
 
-		got, err := calculator.Subtract(testcase.in1, testcase.in2)
-		if err != nil {
-			t.Errorf("Got an unexpected error using %v - %v", testcase.in1, testcase.in2)
-		}
+		got := calculator.Subtract(testcase.in1, testcase.in2)
 		if testcase.want != got {
 			t.Errorf("want %f, got %f in %v", testcase.want, got, testcase.name)
 		}
@@ -76,36 +101,32 @@ func TestSubtract(t *testing.T) {
 }
 
 func TestSubtractMulti(t *testing.T) {
-	testcases := []MultiOpTestCase{
-		{in: []float64{1}, expectsErr: true, name: "Need 2+ operands"},
-		{in: []float64{1, 2}, want: -1, name: "Subtract two numbers"},
-		{in: []float64{1, 2, 3}, want: -4, name: "Subtract three numbers"},
-		{in: []float64{1, 2, 3, 4}, want: -8, name: "Subtract four numbers"},
-		{in: []float64{-1, 2, -3, 4, -5}, want: 1, name: "Subtract five numbers"},
+	testcases := []struct {
+		first, second float64
+		rest          []float64
+		want          float64
+		expectsErr    bool
+		name          string
+	}{
+		{first: 1, second: 2, rest: []float64{}, want: -1, name: "Subtract two numbers"},
+		{first: 1, second: 2, rest: []float64{3}, want: -4, name: "Subtract three numbers"},
+		{first: 1, second: 2, rest: []float64{3, 4}, want: -8, name: "Subtract four numbers"},
+		{first: -1, second: 2, rest: []float64{-3, 4, -5}, want: 1, name: "Subtract five numbers"},
 	}
 	for _, testcase := range testcases {
-		got, err := calculator.Subtract(testcase.in...)
-		switch {
-		case err != nil && !testcase.expectsErr:
-			t.Errorf("Did not expect an error but got one in %v", testcase.name)
-		case err == nil && testcase.expectsErr:
-			t.Errorf("Expected an error and did NOT get one in %v", testcase.name)
-		case err == nil && !testcase.expectsErr:
-			if testcase.want != got {
-				t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
-			}
+		got := calculator.Subtract(testcase.first, testcase.second, testcase.rest...)
+		if testcase.want != got {
+			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
 		}
 	}
 }
+
 func TestSubtractRandom(t *testing.T) {
 	t.Parallel()
 	for i := 0; i < 100; i++ {
 		in1, in2 := rand.Float64(), rand.Float64()
 		want := in1 - in2
-		got, err := calculator.Subtract(in1, in2)
-		if err != nil {
-			t.Errorf("Got an unexpected error using %v - %v", in1, in2)
-		}
+		got := calculator.Subtract(in1, in2)
 		if want != got {
 			t.Errorf("Want %v, got %v, using %v - %v", want, got, in1, in2)
 		}
@@ -114,7 +135,11 @@ func TestSubtractRandom(t *testing.T) {
 
 func TestMultiply(t *testing.T) {
 	t.Parallel()
-	tests := []BinaryOpTestCase{
+	tests := []struct {
+		in1, in2, want float64
+		expectsErr     bool
+		name           string
+	}{
 		{in1: 2, in2: 2, want: 4, name: "Multiply two positives"},
 		{in1: 2, in2: 1, want: 2, name: "Multiply positive and unit"},
 		{in1: 2, in2: 0, want: 0, name: "Multiply positive and zero"},
@@ -127,46 +152,40 @@ func TestMultiply(t *testing.T) {
 		{in1: -2, in2: -2, want: 4, name: "Multiply two negatives"},
 	}
 	for _, testcase := range tests {
-		got, err := calculator.Multiply(testcase.in1, testcase.in2)
-		switch {
-		case err != nil && !testcase.expectsErr:
-			t.Errorf("Did not expect an error but got one in %v", testcase.name)
-		case err == nil && testcase.expectsErr:
-			t.Errorf("Expected an error and did NOT get one in %v", testcase.name)
-		case err == nil && !testcase.expectsErr:
-			if testcase.want != got {
-				t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
-			}
+		got := calculator.Multiply(testcase.in1, testcase.in2)
+		if testcase.want != got {
+			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
 		}
 	}
 }
 
 func TestMultiplyMulti(t *testing.T) {
-	testcases := []MultiOpTestCase{
-		{in: []float64{1}, expectsErr: true, name: "Need 2+ operands"},
-		{in: []float64{1, 2}, want: 2, name: "Multiply two numbers"},
-		{in: []float64{1, 2, 3}, want: 6, name: "Multiply three numbers"},
-		{in: []float64{1, 2, 3, 4}, want: 24, name: "Multiply four numbers"},
-		{in: []float64{-1, 2, -3, 4, -5}, want: -120, name: "Multiply five numbers"},
+	testcases := []struct {
+		first, second, want float64
+		rest                []float64
+		expectsErr          bool
+		name                string
+	}{
+		{first: 1, second: 2, rest: []float64{}, want: 2, name: "Multiply two numbers"},
+		{first: 1, second: 2, rest: []float64{3}, want: 6, name: "Multiply three numbers"},
+		{first: 1, second: 2, rest: []float64{3, 4}, want: 24, name: "Multiply four numbers"},
+		{first: -1, second: 2, rest: []float64{-3, 4, -5}, want: -120, name: "Multiply five numbers"},
 	}
 	for _, testcase := range testcases {
-		got, err := calculator.Multiply(testcase.in...)
-		switch {
-		case err != nil && !testcase.expectsErr:
-			t.Errorf("Did not expect an error but got one in %v", testcase.name)
-		case err == nil && testcase.expectsErr:
-			t.Errorf("Expected an error and did NOT get one in %v", testcase.name)
-		case err == nil && !testcase.expectsErr:
-			if testcase.want != got {
-				t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
-			}
+		got := calculator.Multiply(testcase.first, testcase.second, testcase.rest...)
+		if testcase.want != got {
+			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
 		}
 	}
 }
 
 func TestDivide(t *testing.T) {
 	t.Parallel()
-	tests := []BinaryOpTestCase{
+	tests := []struct {
+		in1, in2, want float64
+		expectsErr     bool
+		name           string
+	}{
 		{in1: 1, in2: 1, want: 1, name: "Divide ones"},
 		{in1: 2, in2: 1, want: 2, name: "Divide 2 by 1"},
 		{in1: 1, in2: 2, want: 0.5, name: "Divide 1 by 2"},
@@ -178,38 +197,37 @@ func TestDivide(t *testing.T) {
 	}
 	for _, testcase := range tests {
 		got, err := calculator.Divide(testcase.in1, testcase.in2)
-		switch {
-		case err != nil && !testcase.expectsErr:
-			t.Errorf("Did not expect an error but got one in %v", testcase.name)
-		case err == nil && testcase.expectsErr:
-			t.Errorf("Expected an error and did NOT get one in %v", testcase.name)
-		case err == nil && !testcase.expectsErr:
-			if testcase.want != got {
-				t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
-			}
+		errorReceived := (err != nil)
+		if testcase.expectsErr != errorReceived {
+			t.Fatalf("unexpected error status: err %v in %v", err, testcase.name)
+		}
+		if !testcase.expectsErr && testcase.want != got {
+			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
 		}
 	}
 }
 
 func TestDivideMulti(t *testing.T) {
-	testcases := []MultiOpTestCase{
-		{in: []float64{1, 2}, want: .5, name: "Divide 2 numbers"},
-		{in: []float64{1, 2, .5}, want: 1, name: "Divide 3 numbers"},
-		{in: []float64{12, 4, 3}, want: 1, name: "Given example"},
-		{in: []float64{1}, expectsErr: true, name: "Can't divide a single number"},
+	testcases := []struct {
+		first, second float64
+		rest          []float64
+		want          float64
+		expectsErr    bool
+		name          string
+	}{
+		{first: 1, second: 2, rest: []float64{}, want: .5, name: "Divide 2 numbers"},
+		{first: 1, second: 2, rest: []float64{.5}, want: 1, name: "Divide 3 numbers"},
+		{first: 12, second: 4, rest: []float64{3}, want: 1, name: "Given example"},
+		{first: 12, second: 4, rest: []float64{0}, expectsErr: true, name: "Given example"},
 	}
 	for _, testcase := range testcases {
-		got, err := calculator.Divide(testcase.in...)
-		switch {
-		case err != nil && !testcase.expectsErr:
-			t.Errorf("Did not expect an error but got one in %v", testcase.name)
-		case err == nil && testcase.expectsErr:
-			t.Errorf("Expected an error and did NOT get one in %v", testcase.name)
-		case err == nil && !testcase.expectsErr:
-			if testcase.want != got {
-				t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
-			}
-
+		got, err := calculator.Divide(testcase.first, testcase.second, testcase.rest...)
+		errorReceived := (err != nil)
+		if testcase.expectsErr != errorReceived {
+			t.Fatalf("unexpected error status: err %v in %v", err, testcase.name)
+		}
+		if !testcase.expectsErr && testcase.want != got {
+			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
 		}
 	}
 }
@@ -244,16 +262,16 @@ func TestEval(t *testing.T) {
 		want       float64
 		expectsErr bool
 	}{
-		{in: "1+2", want: 3, expectsErr: false},
-		{in: "2+2", want: 4, expectsErr: false},
-		{in: "2-3", want: -1, expectsErr: false},
-		{in: "2*3", want: 6, expectsErr: false},
-		{in: "3/2", want: 1.5, expectsErr: false},
-		{in: "1  +    2", want: 3, expectsErr: false},
-		{in: "2 + 2", want: 4, expectsErr: false},
-		{in: "2- 3", want: -1, expectsErr: false},
-		{in: "2     *      3", want: 6, expectsErr: false},
-		{in: "3/   2", want: 1.5, expectsErr: false},
+		{in: "1+2", want: 3},
+		{in: "2+2", want: 4},
+		{in: "2-3", want: -1},
+		{in: "2*3", want: 6},
+		{in: "3/2", want: 1.5},
+		{in: "1  +    2", want: 3},
+		{in: "2 + 2", want: 4},
+		{in: "2- 3", want: -1},
+		{in: "2     *      3", want: 6},
+		{in: "3/   2", want: 1.5},
 		{in: "3/", expectsErr: true},
 		{in: "3*", expectsErr: true},
 		{in: "3+", expectsErr: true},

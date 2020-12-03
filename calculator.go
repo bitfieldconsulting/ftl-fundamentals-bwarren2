@@ -10,77 +10,81 @@ import (
 )
 
 // Add takes two numbers and returns the result of adding them together.
-func Add(a, b float64) float64 {
-	return a + b
+func Add(a, b float64, rest ...float64) float64 {
+	result := a + b
+	for _, item := range rest {
+		result += item
+	}
+
+	return result
 }
 
 // Subtract takes 2+ numbers and returns the result of subtracting the second
 // from the first.  For variadic args, evaluation is (a - b) - c ...
-func Subtract(nums ...float64) (float64, error) {
-	if len(nums) < 2 {
-		return 0, errors.New("Please call with at least 2 args")
+func Subtract(first float64, second float64, rest ...float64) float64 {
+	result := first - second
+
+	for _, item := range rest {
+		result -= item
 	}
-	if len(nums) == 2 {
-		return nums[0] - nums[1], nil
-	}
-	result, err := Subtract(nums[:len(nums)-1]...)
-	if err != nil {
-		return 0, err // How can I mock to test this?
-	}
-	return result - nums[len(nums)-1], nil
+
+	return result
+
 }
 
 // Multiply multiplies 2+ numbers.  For variadic args, evaluation is (a * b) * c ...
-func Multiply(nums ...float64) (float64, error) {
-	if len(nums) < 2 {
-		return 0, errors.New("Please call with at least 2 args")
+func Multiply(first float64, second float64, rest ...float64) float64 {
+	result := first * second
+
+	for _, item := range rest {
+		result *= item
 	}
-	if len(nums) == 2 {
-		return nums[0] * nums[1], nil
-	}
-	result, err := Multiply(nums[:len(nums)-1]...)
-	if err != nil {
-		return 0, err // How can I mock to test this?
-	}
-	return result * nums[len(nums)-1], nil
+
+	return result
 
 }
 
 // Divide divides 2+ numbers or returns an error if it would divide by 0.
 // For variadic args, evaluation is (a / b) / c ...
-func Divide(nums ...float64) (float64, error) {
-	if len(nums) < 2 {
-		return 0, errors.New("We need more operands")
+func Divide(first float64, second float64, rest ...float64) (float64, error) {
+	if second == 0 {
+		return 0, errors.New("can't divide by zero")
 	}
-	if nums[len(nums)-1] == 0 {
-		return 0, errors.New("Can't divide by zero")
+	result := first / second
+
+	for _, item := range rest {
+		if item == 0 {
+			return 0, errors.New("can't divide by zero")
+		}
+		result /= item
 	}
-	if len(nums) == 2 {
-		return nums[0] / nums[1], nil
-	}
-	result, err := Divide(nums[:len(nums)-1]...)
-	if err != nil {
-		return 0, err // How can I mock to get coverage on this line?
-	}
-	return result / nums[len(nums)-1], nil
+
+	return result, nil
 }
 
 // Sqrt takes the square root of a nonnegative number or returns an error.
 func Sqrt(a float64) (float64, error) {
 	if a < 0 {
-		return 0, errors.New("Can't take the square root of a negative number")
+		return 0, errors.New("can't take the square root of a negative number")
 	}
-	return math.Pow(a, .5), nil
+	return math.Sqrt(a), nil
 }
+
+var validExprRe = regexp.MustCompile(`\d*(\.\d)?\s*[-+\/*]\s*\d*(\.\d)?$`)
+var operatorRe = regexp.MustCompile(`[-+\/*]`)
 
 // EvalExpr evaluates simple arithmetic expressions of "float64 operator float64"
 func EvalExpr(in string) (float64, error) {
-	re := regexp.MustCompile(`\d*(\.\d)?\s*[-+\/*]\s*\d*(\.\d)?$`)
-	if !re.MatchString(in) {
-		return 0, errors.New("Could not parse input expression")
+
+	if !validExprRe.MatchString(in) {
+		return 0, errors.New("could not parse input expression")
 	}
-	operatorRe := regexp.MustCompile(`[-+\/*]`)
-	operator := operatorRe.FindAllString(in, -1)[0]
+
+	operatorMatch := operatorRe.FindAllString(in, -1)
+	if len(operatorMatch) < 1 {
+		return 0, errors.New("we couldn't get an operator")
+	}
+	operator := operatorMatch[0]
 	parts := strings.Split(in, operator)
 
 	left, err := strconv.ParseFloat(strings.TrimSpace(parts[0]), 64)
