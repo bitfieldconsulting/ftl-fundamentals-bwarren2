@@ -76,7 +76,7 @@ func TestBasicOps(t *testing.T) {
 	for _, tc := range tcs {
 		got := tc.fn(tc.a, tc.b, tc.rest...)
 		if tc.want != got {
-			t.Errorf("%v(%f, %f): want %v, got %v", runtime.FuncForPC(reflect.ValueOf(tc.fn).Pointer()).Name(), tc.a, tc.b, tc.want, got)
+			t.Errorf("%v(%f, %f, %v): want %v, got %v", runtime.FuncForPC(reflect.ValueOf(tc.fn).Pointer()).Name(), tc.a, tc.b, tc.rest, tc.want, got)
 		}
 	}
 }
