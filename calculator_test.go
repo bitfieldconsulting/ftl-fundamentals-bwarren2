@@ -4,20 +4,21 @@ import (
 	"calculator"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestAdd(t *testing.T) {
 	tcs := []struct {
+		name string
 		a, b float64
 		rest []float64
 		want float64
-		name string
 	}{
-		{name: "Add two units", a: 0, b: 0, rest: []float64{}, want: 0},
-		{name: "Add two nonunits", a: 1, b: 2, rest: []float64{}, want: 3},
-		{name: "Add unit and nonunit", a: 0, b: 2, rest: []float64{}, want: 2},
-		{name: "Add negative and inverse", a: -2, b: 2, rest: []float64{}, want: 0},
-		{name: "Add negative and positive", a: -2, b: 3, rest: []float64{}, want: 1},
+		{name: "Add two units", a: 0, b: 0, want: 0},
+		{name: "Add two nonunits", a: 1, b: 2, want: 3},
+		{name: "Add unit and nonunit", a: 0, b: 2, want: 2},
+		{name: "Add negative and inverse", a: -2, b: 2, want: 0},
+		{name: "Add negative and positive", a: -2, b: 3, want: 1},
 		{name: "Add two numbers", a: 1, b: 2, rest: []float64{}, want: 3},
 		{name: "Add three numbers", a: 1, b: 2, rest: []float64{3}, want: 6},
 		{name: "Add four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: 10},
@@ -30,8 +31,9 @@ func TestAdd(t *testing.T) {
 		}
 	}
 }
-func TestAddRandom(t *testing.T) {
+func TestRandomly(t *testing.T) {
 	t.Parallel()
+	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < 100; i++ {
 		a, b := rand.Float64(), rand.Float64()
 		want := a + b
@@ -40,6 +42,16 @@ func TestAddRandom(t *testing.T) {
 			t.Errorf("Want %f, got %f, using %f + %f", want, got, a, b)
 		}
 	}
+	for i := 0; i < 100; i++ {
+
+		a, b := rand.Float64(), rand.Float64()
+		want := a - b
+		got := calculator.Subtract(a, b)
+		if want != got {
+			t.Errorf("Want %v, got %v, using %v - %v", want, got, a, b)
+		}
+	}
+
 }
 
 func TestSubtract(t *testing.T) {
@@ -63,18 +75,6 @@ func TestSubtract(t *testing.T) {
 		got := calculator.Subtract(tc.a, tc.b, tc.rest...)
 		if tc.want != got {
 			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
-		}
-	}
-}
-
-func TestSubtractRandom(t *testing.T) {
-	t.Parallel()
-	for i := 0; i < 100; i++ {
-		a, b := rand.Float64(), rand.Float64()
-		want := a - b
-		got := calculator.Subtract(a, b)
-		if want != got {
-			t.Errorf("Want %v, got %v, using %v - %v", want, got, a, b)
 		}
 	}
 }
