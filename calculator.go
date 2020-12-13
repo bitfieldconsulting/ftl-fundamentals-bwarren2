@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"regexp"
 )
 
 // Add takes 2+ numbers and returns the result of adding them together.
@@ -59,15 +58,10 @@ func Sqrt(a float64) (float64, error) {
 	return math.Sqrt(a), nil
 }
 
-var validExprRe = regexp.MustCompile(`\d*(\.\d)?\s*[-+\/*]\s*\d*(\.\d)?$`)
-var operatorRe = regexp.MustCompile(`[-+\/*]`)
-
 // EvalExpr evaluates simple arithmetic expressions of "float64 operator float64"
 func EvalExpr(in string) (float64, error) {
-
 	var left, right float64
 	var operator string
-
 	scanned, err := fmt.Sscanf(in, "%v%1s%v", &left, &operator, &right)
 	if err != nil && err != io.EOF || scanned != 3 {
 		return 0, err
