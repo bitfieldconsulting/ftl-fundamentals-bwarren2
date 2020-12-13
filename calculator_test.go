@@ -7,30 +7,6 @@ import (
 	"time"
 )
 
-func TestAdd(t *testing.T) {
-	tcs := []struct {
-		name string
-		a, b float64
-		rest []float64
-		want float64
-	}{
-		{name: "Add two units", a: 0, b: 0, want: 0},
-		{name: "Add two nonunits", a: 1, b: 2, want: 3},
-		{name: "Add unit and nonunit", a: 0, b: 2, want: 2},
-		{name: "Add negative and inverse", a: -2, b: 2, want: 0},
-		{name: "Add negative and positive", a: -2, b: 3, want: 1},
-		{name: "Add two numbers", a: 1, b: 2, rest: []float64{}, want: 3},
-		{name: "Add three numbers", a: 1, b: 2, rest: []float64{3}, want: 6},
-		{name: "Add four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: 10},
-		{name: "Add five numbers", a: -1, b: 2, rest: []float64{-3, 4, -5}, want: -3},
-	}
-	for _, tc := range tcs {
-		got := calculator.Add(tc.a, tc.b, tc.rest...)
-		if tc.want != got {
-			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
-		}
-	}
-}
 func TestRandomly(t *testing.T) {
 	t.Parallel()
 	rand.Seed(time.Now().UnixNano())
@@ -54,55 +30,49 @@ func TestRandomly(t *testing.T) {
 
 }
 
-func TestSubtract(t *testing.T) {
+func TestBasicOps(t *testing.T) {
 	tcs := []struct {
+		name       string
+		fn         func(a float64, b float64, rest ...float64) float64
 		a, b       float64
 		rest       []float64
 		want       float64
 		expectsErr bool
-		name       string
 	}{
-		{name: "Subtract two positives", a: 4, b: 2, rest: []float64{}, want: 2},
-		{name: "Subtract positive and zero", a: 2, b: 0, rest: []float64{}, want: 2},
-		{name: "Subtract zero and positive", a: 0, b: 2, rest: []float64{}, want: -2},
-		{name: "Subtract two negatives", a: -1, b: -2, rest: []float64{}, want: 1},
-		{name: "Subtract two numbers", a: 1, b: 2, rest: []float64{}, want: -1},
-		{name: "Subtract three numbers", a: 1, b: 2, rest: []float64{3}, want: -4},
-		{name: "Subtract four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: -8},
-		{name: "Subtract five numbers", a: -1, b: 2, rest: []float64{-3, 4, -5}, want: 1},
+		{name: "Add two units", fn: calculator.Add, a: 0, b: 0, want: 0},
+		{name: "Add two nonunits", fn: calculator.Add, a: 1, b: 2, want: 3},
+		{name: "Add unit and nonunit", fn: calculator.Add, a: 0, b: 2, want: 2},
+		{name: "Add negative and inverse", fn: calculator.Add, a: -2, b: 2, want: 0},
+		{name: "Add negative and positive", fn: calculator.Add, a: -2, b: 3, want: 1},
+		{name: "Add two numbers", fn: calculator.Add, a: 1, b: 2, want: 3},
+		{name: "Add three numbers", fn: calculator.Add, a: 1, b: 2, rest: []float64{3}, want: 6},
+		{name: "Add four numbers", fn: calculator.Add, a: 1, b: 2, rest: []float64{3, 4}, want: 10},
+		{name: "Add five numbers", fn: calculator.Add, a: -1, b: 2, rest: []float64{-3, 4, -5}, want: -3},
+		{name: "Subtract two positives", fn: calculator.Subtract, a: 4, b: 2, want: 2},
+		{name: "Subtract positive and zero", fn: calculator.Subtract, a: 2, b: 0, want: 2},
+		{name: "Subtract zero and positive", fn: calculator.Subtract, a: 0, b: 2, want: -2},
+		{name: "Subtract two negatives", fn: calculator.Subtract, a: -1, b: -2, want: 1},
+		{name: "Subtract two numbers", fn: calculator.Subtract, a: 1, b: 2, want: -1},
+		{name: "Subtract three numbers", fn: calculator.Subtract, a: 1, b: 2, rest: []float64{3}, want: -4},
+		{name: "Subtract four numbers", fn: calculator.Subtract, a: 1, b: 2, rest: []float64{3, 4}, want: -8},
+		{name: "Subtract five numbers", fn: calculator.Subtract, a: -1, b: 2, rest: []float64{-3, 4, -5}, want: 1},
+		{name: "Multiply two positives", fn: calculator.Multiply, a: 2, b: 2, want: 4},
+		{name: "Multiply positive and unit", fn: calculator.Multiply, a: 2, b: 1, want: 2},
+		{name: "Multiply positive and zero", fn: calculator.Multiply, a: 2, b: 0, want: 0},
+		{name: "Multiply zero and zero", fn: calculator.Multiply, a: 0, b: 0, want: 0},
+		{name: "Multiply zero and negative", fn: calculator.Multiply, a: 0, b: -1, want: 0},
+		{name: "Multiply positive and negative units", fn: calculator.Multiply, a: 1, b: -1, want: -1},
+		{name: "Multiply positive and negative unit", fn: calculator.Multiply, a: 2, b: -1, want: -2},
+		{name: "Multiply two negative units", fn: calculator.Multiply, a: -1, b: -1, want: 1},
+		{name: "Multiply negative and negative unit", fn: calculator.Multiply, a: -2, b: -1, want: 2},
+		{name: "Multiply two negatives", fn: calculator.Multiply, a: -2, b: -2, want: 4},
+		{name: "Multiply two numbers", fn: calculator.Multiply, a: 1, b: 2, want: 2},
+		{name: "Multiply three numbers", fn: calculator.Multiply, a: 1, b: 2, rest: []float64{3}, want: 6},
+		{name: "Multiply four numbers", fn: calculator.Multiply, a: 1, b: 2, rest: []float64{3, 4}, want: 24},
+		{name: "Multiply five numbers", fn: calculator.Multiply, a: -1, b: 2, rest: []float64{-3, 4, -5}, want: -120},
 	}
 	for _, tc := range tcs {
-		got := calculator.Subtract(tc.a, tc.b, tc.rest...)
-		if tc.want != got {
-			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
-		}
-	}
-}
-
-func TestMultiply(t *testing.T) {
-	tcs := []struct {
-		a, b, want float64
-		rest       []float64
-		expectsErr bool
-		name       string
-	}{
-		{name: "Multiply two positives", a: 2, b: 2, rest: []float64{}, want: 4},
-		{name: "Multiply positive and unit", a: 2, b: 1, rest: []float64{}, want: 2},
-		{name: "Multiply positive and zero", a: 2, b: 0, rest: []float64{}, want: 0},
-		{name: "Multiply zero and zero", a: 0, b: 0, rest: []float64{}, want: 0},
-		{name: "Multiply zero and negative", a: 0, b: -1, rest: []float64{}, want: 0},
-		{name: "Multiply positive and negative units", a: 1, b: -1, rest: []float64{}, want: -1},
-		{name: "Multiply positive and negative unit", a: 2, b: -1, rest: []float64{}, want: -2},
-		{name: "Multiply two negative units", a: -1, b: -1, rest: []float64{}, want: 1},
-		{name: "Multiply negative and negative unit", a: -2, b: -1, rest: []float64{}, want: 2},
-		{name: "Multiply two negatives", a: -2, b: -2, rest: []float64{}, want: 4},
-		{name: "Multiply two numbers", a: 1, b: 2, rest: []float64{}, want: 2},
-		{name: "Multiply three numbers", a: 1, b: 2, rest: []float64{3}, want: 6},
-		{name: "Multiply four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: 24},
-		{name: "Multiply five numbers", a: -1, b: 2, rest: []float64{-3, 4, -5}, want: -120},
-	}
-	for _, tc := range tcs {
-		got := calculator.Multiply(tc.a, tc.b, tc.rest...)
+		got := tc.fn(tc.a, tc.b, tc.rest...)
 		if tc.want != got {
 			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
 		}
@@ -117,15 +87,15 @@ func TestDivide(t *testing.T) {
 		expectsErr bool
 		name       string
 	}{
-		{name: "Divide ones", a: 1, b: 1, rest: []float64{}, want: 1},
-		{name: "Divide 2 by 1", a: 2, b: 1, rest: []float64{}, want: 2},
-		{name: "Divide 1 by 2", a: 1, b: 2, rest: []float64{}, want: 0.5},
+		{name: "Divide ones", a: 1, b: 1, want: 1},
+		{name: "Divide 2 by 1", a: 2, b: 1, want: 2},
+		{name: "Divide 1 by 2", a: 1, b: 2, want: 0.5},
 		{name: "Divide positive by zero", a: 1, b: 0, expectsErr: true},
 		{name: "Divide positive by zero", a: -1, b: 0, expectsErr: true},
 		{name: "Divide negative by zero", a: 0, b: 0, expectsErr: true},
-		{name: "Divide negative by zero", a: -1, b: -1, rest: []float64{}, want: 1},
-		{name: "Divide positive by negative", a: 2, b: -1, rest: []float64{}, want: -2},
-		{name: "Divide 2 numbers", a: 1, b: 2, rest: []float64{}, want: .5},
+		{name: "Divide negative by zero", a: -1, b: -1, want: 1},
+		{name: "Divide positive by negative", a: 2, b: -1, want: -2},
+		{name: "Divide 2 numbers", a: 1, b: 2, want: .5},
 		{name: "Divide 3 numbers", a: 1, b: 2, rest: []float64{.5}, want: 1},
 		{name: "Divide 3 numbers, 3rd zero", a: 1, b: 2, rest: []float64{0}, expectsErr: true},
 		{name: "Given example", a: 12, b: 4, rest: []float64{3}, want: 1},

@@ -4,7 +4,6 @@ package calculator
 import (
 	"errors"
 	"fmt"
-	"io"
 	"math"
 )
 
@@ -62,8 +61,8 @@ func Sqrt(a float64) (float64, error) {
 func EvalExpr(in string) (float64, error) {
 	var left, right float64
 	var operator string
-	scanned, err := fmt.Sscanf(in, "%v%1s%v", &left, &operator, &right)
-	if err != nil && err != io.EOF || scanned != 3 {
+	_, err := fmt.Sscanf(in, "%v%1s%v", &left, &operator, &right)
+	if err != nil {
 		return 0, err
 	}
 	switch operator {
