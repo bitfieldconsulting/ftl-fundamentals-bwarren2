@@ -3,6 +3,8 @@ package calculator_test
 import (
 	"calculator"
 	"math/rand"
+	"reflect"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -74,7 +76,7 @@ func TestBasicOps(t *testing.T) {
 	for _, tc := range tcs {
 		got := tc.fn(tc.a, tc.b, tc.rest...)
 		if tc.want != got {
-			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
+			t.Errorf("%v(%f, %f): want %v, got %v", runtime.FuncForPC(reflect.ValueOf(tc.fn).Pointer()).Name(), tc.a, tc.b, tc.want, got)
 		}
 	}
 }
