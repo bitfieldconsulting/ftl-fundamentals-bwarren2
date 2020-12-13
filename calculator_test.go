@@ -7,7 +7,7 @@ import (
 )
 
 func TestAdd(t *testing.T) {
-	testcases := []struct {
+	tcs := []struct {
 		a, b float64
 		rest []float64
 		want float64
@@ -23,10 +23,10 @@ func TestAdd(t *testing.T) {
 		{name: "Add four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: 10},
 		{name: "Add five numbers", a: -1, b: 2, rest: []float64{-3, 4, -5}, want: -3},
 	}
-	for _, testcase := range testcases {
-		got := calculator.Add(testcase.a, testcase.b, testcase.rest...)
-		if testcase.want != got {
-			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
+	for _, tc := range tcs {
+		got := calculator.Add(tc.a, tc.b, tc.rest...)
+		if tc.want != got {
+			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
 		}
 	}
 }
@@ -43,7 +43,7 @@ func TestAddRandom(t *testing.T) {
 }
 
 func TestSubtract(t *testing.T) {
-	testcases := []struct {
+	tcs := []struct {
 		a, b       float64
 		rest       []float64
 		want       float64
@@ -59,10 +59,10 @@ func TestSubtract(t *testing.T) {
 		{name: "Subtract four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: -8},
 		{name: "Subtract five numbers", a: -1, b: 2, rest: []float64{-3, 4, -5}, want: 1},
 	}
-	for _, testcase := range testcases {
-		got := calculator.Subtract(testcase.a, testcase.b, testcase.rest...)
-		if testcase.want != got {
-			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
+	for _, tc := range tcs {
+		got := calculator.Subtract(tc.a, tc.b, tc.rest...)
+		if tc.want != got {
+			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
 		}
 	}
 }
@@ -80,7 +80,7 @@ func TestSubtractRandom(t *testing.T) {
 }
 
 func TestMultiply(t *testing.T) {
-	testcases := []struct {
+	tcs := []struct {
 		a, b, want float64
 		rest       []float64
 		expectsErr bool
@@ -101,16 +101,16 @@ func TestMultiply(t *testing.T) {
 		{name: "Multiply four numbers", a: 1, b: 2, rest: []float64{3, 4}, want: 24},
 		{name: "Multiply five numbers", a: -1, b: 2, rest: []float64{-3, 4, -5}, want: -120},
 	}
-	for _, testcase := range testcases {
-		got := calculator.Multiply(testcase.a, testcase.b, testcase.rest...)
-		if testcase.want != got {
-			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
+	for _, tc := range tcs {
+		got := calculator.Multiply(tc.a, tc.b, tc.rest...)
+		if tc.want != got {
+			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
 		}
 	}
 }
 
 func TestDivide(t *testing.T) {
-	testcases := []struct {
+	tcs := []struct {
 		a, b       float64
 		rest       []float64
 		want       float64
@@ -127,23 +127,24 @@ func TestDivide(t *testing.T) {
 		{name: "Divide positive by negative", a: 2, b: -1, rest: []float64{}, want: -2},
 		{name: "Divide 2 numbers", a: 1, b: 2, rest: []float64{}, want: .5},
 		{name: "Divide 3 numbers", a: 1, b: 2, rest: []float64{.5}, want: 1},
+		{name: "Divide 3 numbers, 3rd zero", a: 1, b: 2, rest: []float64{0}, expectsErr: true},
 		{name: "Given example", a: 12, b: 4, rest: []float64{3}, want: 1},
 		{name: "Given example", a: 12, b: 4, rest: []float64{0}, expectsErr: true},
 	}
-	for _, testcase := range testcases {
-		got, err := calculator.Divide(testcase.a, testcase.b, testcase.rest...)
+	for _, tc := range tcs {
+		got, err := calculator.Divide(tc.a, tc.b, tc.rest...)
 		errorReceived := err != nil
-		if testcase.expectsErr != errorReceived {
-			t.Fatalf("unexpected error status: err %v in %v", err, testcase.name)
+		if tc.expectsErr != errorReceived {
+			t.Fatalf("unexpected error status: err %v in %v", err, tc.name)
 		}
-		if !testcase.expectsErr && testcase.want != got {
-			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
+		if !tc.expectsErr && tc.want != got {
+			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
 		}
 	}
 }
 
 func TestSqrt(t *testing.T) {
-	testcases := []struct {
+	tcs := []struct {
 		in, want   float64
 		expectsErr bool
 		name       string
@@ -155,20 +156,20 @@ func TestSqrt(t *testing.T) {
 		{name: "Sqrt small negative number", in: -0.000000001, expectsErr: true},
 		{name: "Sqrt negative number", in: -1, expectsErr: true},
 	}
-	for _, testcase := range testcases {
-		got, err := calculator.Sqrt(testcase.in)
+	for _, tc := range tcs {
+		got, err := calculator.Sqrt(tc.in)
 		errorReceived := err != nil
-		if testcase.expectsErr != errorReceived {
-			t.Fatalf("unexpected error status: err %v in %v", err, testcase.name)
+		if tc.expectsErr != errorReceived {
+			t.Fatalf("unexpected error status: err %v in %v", err, tc.name)
 		}
-		if !testcase.expectsErr && testcase.want != got {
-			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.name)
+		if !tc.expectsErr && tc.want != got {
+			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.name)
 		}
 	}
 }
 
 func TestEval(t *testing.T) {
-	testcases := []struct {
+	tcs := []struct {
 		in         string
 		want       float64
 		expectsErr bool
@@ -199,14 +200,14 @@ func TestEval(t *testing.T) {
 		{in: "2**3", expectsErr: true},
 	}
 
-	for _, testcase := range testcases {
-		got, err := calculator.EvalExpr(testcase.in)
+	for _, tc := range tcs {
+		got, err := calculator.EvalExpr(tc.in)
 		errorReceived := err != nil
-		if testcase.expectsErr != errorReceived {
-			t.Fatalf("unexpected error status: err %v given %v", err, testcase.in)
+		if tc.expectsErr != errorReceived {
+			t.Fatalf("unexpected error status: err %v given %v", err, tc.in)
 		}
-		if !testcase.expectsErr && testcase.want != got {
-			t.Errorf("Wanted %v, got %v in %v", testcase.want, got, testcase.in)
+		if !tc.expectsErr && tc.want != got {
+			t.Errorf("Wanted %v, got %v in %v", tc.want, got, tc.in)
 		}
 
 	}

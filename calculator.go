@@ -4,10 +4,8 @@ package calculator
 import (
 	"errors"
 	"fmt"
+	"io"
 	"math"
-	"regexp"
-	"strconv"
-	"strings"
 )
 
 // Add takes 2+ numbers and returns the result of adding them together.
@@ -16,54 +14,43 @@ func Add(a, b float64, rest ...float64) float64 {
 	for _, item := range rest {
 		result += item
 	}
-
 	return result
 }
 
-// Subtract takes 2+ numbers and returns the result of subtracting the b
-// from the a.  For variadic args, evaluation is (a - b) - c ...
+// Subtract takes 2+ numbers and subtracts them together.
 func Subtract(a float64, b float64, rest ...float64) float64 {
 	result := a - b
-
 	for _, item := range rest {
 		result -= item
 	}
-
 	return result
-
 }
 
-// Multiply multiplies 2+ numbers.  For variadic args, evaluation is (a * b) * c ...
+// Multiply multiplies 2+ numbers.
 func Multiply(a float64, b float64, rest ...float64) float64 {
 	result := a * b
-
 	for _, item := range rest {
 		result *= item
 	}
-
 	return result
-
 }
 
 // Divide divides 2+ numbers or returns an error if it would divide by 0.
-// For variadic args, evaluation is (a / b) / c ...
 func Divide(a float64, b float64, rest ...float64) (float64, error) {
 	if b == 0 {
 		return 0, errors.New("can't divide by zero")
 	}
 	result := a / b
-
 	for _, item := range rest {
 		if item == 0 {
 			return 0, errors.New("can't divide by zero")
 		}
 		result /= item
 	}
-
 	return result, nil
 }
 
-// Sqrt takes the square root of a nonnegative number or returns an error.
+// Sqrt takes a nonnegative number and returns its square root or returns an error.
 func Sqrt(a float64) (float64, error) {
 	if a < 0 {
 		return 0, fmt.Errorf("can't take the square root of a negative number: %f", a)
