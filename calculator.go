@@ -68,10 +68,9 @@ func EvalExpr(in string) (float64, error) {
 	var left, right float64
 	var operator string
 
-	_, err := fmt.Sscanf(in, "%v%v%v", &left, &operator, &right)
-	if err != nil && err != io.EOF {
-		fmt.Print(err)
-		panic(err)
+	scanned, err := fmt.Sscanf(in, "%v%1s%v", &left, &operator, &right)
+	if err != nil && err != io.EOF || scanned != 3 {
+		return 0, err
 	}
 	switch operator {
 	case "+":
