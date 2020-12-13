@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"regexp"
 )
 
 // Add takes 2+ numbers and returns the result of adding them together.
@@ -64,36 +65,24 @@ var operatorRe = regexp.MustCompile(`[-+\/*]`)
 // EvalExpr evaluates simple arithmetic expressions of "float64 operator float64"
 func EvalExpr(in string) (float64, error) {
 
-	if !validExprRe.MatchString(in) {
-		return 0, errors.New("could not parse input expression")
-	}
+	var left, right float64
+	var operator string
 
-	operatorMatch := operatorRe.FindAllString(in, -1)
-	if len(operatorMatch) < 1 {
-		return 0, errors.New("we couldn't get an operator")
+	_, err := fmt.Sscanf(in, "%v%v%v", &left, &operator, &right)
+	if err != nil && err != io.EOF {
+		fmt.Print(err)
+		panic(err)
 	}
-	operator := operatorMatch[0]
-	parts := strings.Split(in, operator)
-
-	left, err := strconv.ParseFloat(strings.TrimSpace(parts[0]), 64)
-	if err != nil {
-		return 0, err
-	}
-	right, err := strconv.ParseFloat(strings.TrimSpace(parts[1]), 64)
-	if err != nil {
-		return 0, err
-	}
-
 	switch operator {
-	case `+`:
+	case "+":
 		return left + right, nil
-	case `-`:
+	case "-":
 		return left - right, nil
-	case `*`:
+	case "*":
 		return left * right, nil
-	case `/`:
+	case "/":
 		return left / right, nil
 	default:
-		return 0, errors.New("Could not match the given operator")
+		return 0, fmt.Errorf("Could not match the given operator: %v", operator)
 	}
 }
