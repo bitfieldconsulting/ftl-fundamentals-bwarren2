@@ -9,21 +9,19 @@ import (
 	"time"
 )
 
+var random = rand.New(rand.NewSource(time.Now().UnixNano()))
+
 func TestRandomly(t *testing.T) {
 	t.Parallel()
-	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < 100; i++ {
-		a, b := rand.Float64(), rand.Float64()
+		a, b := rand.Float64(), random.Float64()
 		want := a + b
 		got := calculator.Add(a, b)
 		if want != got {
 			t.Errorf("Want %f, got %f, using %f + %f", want, got, a, b)
 		}
-	}
-	for i := 0; i < 100; i++ {
-		a, b := rand.Float64(), rand.Float64()
-		want := a - b
-		got := calculator.Subtract(a, b)
+		want = a - b
+		got = calculator.Subtract(a, b)
 		if want != got {
 			t.Errorf("Want %v, got %v, using %v - %v", want, got, a, b)
 		}
