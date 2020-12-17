@@ -49,7 +49,7 @@ func Divide(a float64, b float64, rest ...float64) (float64, error) {
 	return result, nil
 }
 
-// Sqrt takes a nonnegative number and returns its square root or returns an error.
+// Sqrt takes a number and returns an error if the input is negative, otherwise returns its square root
 func Sqrt(a float64) (float64, error) {
 	if a < 0 {
 		return 0, fmt.Errorf("can't take the square root of a negative number: %f", a)
@@ -63,7 +63,7 @@ func EvalExpr(in string) (float64, error) {
 	var operator string
 	_, err := fmt.Sscanf(in, "%v%1s%v", &left, &operator, &right)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("Got an error (%v) while evaluating this: %v", err, in)
 	}
 	switch operator {
 	case "+":

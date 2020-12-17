@@ -21,7 +21,6 @@ func TestRandomly(t *testing.T) {
 		}
 	}
 	for i := 0; i < 100; i++ {
-
 		a, b := rand.Float64(), rand.Float64()
 		want := a - b
 		got := calculator.Subtract(a, b)
@@ -171,7 +170,6 @@ func TestEval(t *testing.T) {
 		{in: "2^2", expectsErr: true},
 		{in: "2**3", expectsErr: true},
 	}
-
 	for _, tc := range tcs {
 		got, err := calculator.EvalExpr(tc.in)
 		errorReceived := err != nil
